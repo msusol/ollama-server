@@ -1,4 +1,4 @@
-# gemma-server stack
+# ollama-server stack
 
 ## Prerequisites
 
@@ -9,7 +9,7 @@
 
 1. Create the external data volume (first run only):
    ```zsh
-   docker volume create gemma_server_data
+   docker volume create ollama_server_data
    ```
 2. Bring up the service:
    ```zsh
@@ -17,7 +17,7 @@
    ```
 3. Pull the model:
    ```zsh
-   docker exec gemma-server ollama pull gemma4:26b
+   docker exec ollama-server ollama pull gemma4:26b
    ```
 4. Verify it's serving:
    ```zsh
@@ -26,7 +26,7 @@
 
 ## Expected output
 
-`/api/tags` lists `gemma4:26b`. `docker logs gemma-server` shows the model
+`/api/tags` lists `gemma4:26b`. `docker logs ollama-server` shows the model
 loaded on GPU with no OOM errors.
 
 ## Troubleshooting
@@ -43,5 +43,5 @@ loaded on GPU with no OOM errors.
 
 ## Related docs
 
-- [Standalone shared Gemma server ADR](../adr/0001-standalone-shared-gemma-server.md)
+- [Standalone shared Gemma server ADR](../adr/0001-standalone-shared-ollama-server.md)
 - [Qwen → Gemma 4 migration plan](../plans/2026-09-27-qwen-to-gemma4-migration.md)

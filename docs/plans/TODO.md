@@ -12,9 +12,9 @@ for full context. Scope: `mattermost/bridge` + `accountant_agent` only —
 scope.
 
 - [x] Repo scaffolded (`compose.yaml`, `docs/{adr,plans,process,specs}`)
-- [ ] Stand up `gemma-server` container, pull `gemma4:26b`
+- [ ] Stand up `ollama-server` container, pull `gemma4:26b`
 - [ ] Re-run `lori-model-evaluation-plan.md`-style behavioral eval against
-      `gemma-server`
+      `ollama-server`
 - [ ] Validate `accountant_agent` categorization + wiki-extraction quality
       against Gemma vs. the Qwen baseline
 - [ ] Cut over `mattermost/bridge/backends.py` and
@@ -22,11 +22,11 @@ scope.
 - [ ] Re-run `mattermost/bridge/tests/` and `accountant_agent/tests/` —
       fix any Qwen-specific assertions
 - [ ] Update `accountant_agent` and `mattermost` process/spec docs to
-      reference `gemma-server` instead of `ollama-poc`
+      reference `ollama-server` instead of `ollama-poc`
 - [ ] Retire `ollama-poc` service + volume from `mattermost/docker-compose.yml`
 
 ## Next steps
 
 ### Qwen → Gemma 4 migration
-1. Bring up `gemma-server` and pull `gemma4:26b` on `spark-db62`.
+1. Bring up `ollama-server` and pull `gemma4:26b` on `spark-db62`.
 2. Re-run the behavioral eval before touching any consumer's env vars.

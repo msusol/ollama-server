@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Superseded by ADR-0002 (`0002-consolidate-all-project-ollama-onto-ollama-server.md`)
 
 ## Context
 

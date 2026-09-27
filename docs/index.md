@@ -1,13 +1,15 @@
-# gemma-server docs
+# ollama-server docs
 
-Shared Ollama/Gemma 4 model-serving container for the `LosusAIOps`
-cluster, replacing `ollama-poc` (`qwen3:14b`).
+Shared Ollama model-serving container for the `LosusAIOps` cluster,
+currently serving Gemma 4 (`gemma4:26b`). Replaces `ollama-poc`
+(`qwen3:14b`) and `clp-ollama` (`gemma4:12b`).
 
 ## Start here
 
-- [ADR 0001 — Standalone shared Gemma server](adr/0001-standalone-shared-gemma-server.md)
-- [Qwen → Gemma 4 migration plan](plans/2026-09-27-qwen-to-gemma4-migration.md)
-- [Stack process doc](process/gemma-server-stack.md)
+- [ADR 0001 — Standalone shared Gemma server](adr/0001-standalone-shared-gemma-server.md) *(superseded by ADR 0002)*
+- [ADR 0002 — Consolidate all project Ollama onto ollama-server](adr/0002-consolidate-all-project-ollama-onto-ollama-server.md)
+- [Ollama consolidation & Qwen → Gemma 4 migration plan](plans/2026-09-27-qwen-to-gemma4-migration.md)
+- [Stack process doc](process/ollama-server-stack.md)
 
 ## Layout
 
