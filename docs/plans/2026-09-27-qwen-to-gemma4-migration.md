@@ -124,8 +124,13 @@ accuracy needs its own spot-check, not just a code-level test pass.
 
 ### Cut over
 
-- [ ] Update `mattermost/bridge/backends.py` defaults (or its `.env`) —
-      `OLLAMA_URL` → `ollama-server`'s address, `OLLAMA_MODEL=gemma4:26b`
+- [x] Update `mattermost/bridge`'s `OLLAMA_URL`/`OLLAMA_MODEL` — done
+      2026-09-27, in `docker-compose.yml`'s `environment:` (not `backends.py`
+      defaults or a `.env` — that's where this setting already lived), via a
+      new `ollama-server_default` external network declared alongside
+      `accountant` (replacing an earlier manual `docker network connect`).
+      Rebuilt and recreated the container; confirmed clean startup and
+      Mattermost reconnection.
 - [x] Update `accountant_agent/categorize/llm.py` and
       `accountant_agent/wiki/extract.py` defaults — done 2026-09-27. Found
       there was no override anywhere (no systemd `Environment=`, no `.env`
@@ -145,18 +150,25 @@ accuracy needs its own spot-check, not just a code-level test pass.
       override flags). Also added `test_ownership_parser_llm.py`, mocked
       unit test coverage for `parse_ownership()` that didn't exist before
 - [x] Re-ran `accountant_agent/tests/` (547 tests) after cutover — all pass,
-      confirmed with zero override flags against the new default. `mattermost`
-      re-run still pending — see above.
+      confirmed with zero override flags against the new default.
+- [x] Re-ran `mattermost/bridge/tests/` (313 tests, up from the 161 recorded
+      when `lori-model-evaluation-plan.md` was first written) — all pass, run
+      from the repo root using the shared Spark `.venv` (bridge's own
+      container can't run its tests — `conftest.py` needs host-level Docker
+      access and a full repo checkout; see that plan's new "Test environment
+      note"). No Qwen-specific assertion needed fixing.
 - [x] Update `accountant_agent/docs/process/categorization.md` and
       `document-wiki.md` — done 2026-09-27
 - [ ] Update `daily-run.md`, `accountant_agent/docs/specs/lori-system-overview.md`,
-      `mattermost/docs/process/mattermost-stack.md`, and `clp_parcel_ai`'s
-      own docs referencing `clp-ollama` — replace with `ollama-server`
+      and `clp_parcel_ai`'s own docs referencing `clp-ollama` — replace with
+      `ollama-server`
 
 ### Retire ollama-poc and clp-ollama
 
 - [ ] Confirm `ollama-server` has run cutover in production for a burn-in
-      period with no regressions reported, for **both** consumer groups
+      period with no regressions reported, for **all three** consumer groups
+      (now all cut over: `clp_parcel_ai`, `accountant_agent`,
+      `mattermost/bridge`)
 - [ ] Remove the `ollama-poc` service from `mattermost/docker-compose.yml`
       and its `ollama_poc_data` volume
 - [ ] Remove the `ollama`/`clp-ollama` service from

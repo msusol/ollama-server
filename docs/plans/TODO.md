@@ -40,13 +40,23 @@ out of scope.
       at all beforehand. `ollama-poc` untouched (it's `mattermost`'s own
       compose service, not `accountant_agent`'s). Full writeup:
       `ColoradoLandPartners/accountant_agent/docs/plans/2026-09-27-ollama-server-cutover-eval.md`
-- [ ] Cut over `mattermost/bridge/backends.py` env vars (the last remaining
-      consumer)
-- [ ] Re-run `mattermost/bridge/tests/` — fix any Qwen-specific assertions
-- [ ] Update `mattermost`'s and `accountant_agent`'s remaining process/spec
-      docs (`daily-run.md`, `lori-system-overview.md`,
-      `mattermost-stack.md`) to reference `ollama-server` instead of
-      `ollama-poc`
+- [x] **`mattermost/bridge` fully cut over** — 2026-09-27, the last remaining
+      consumer. `OLLAMA_URL`/`OLLAMA_MODEL` repointed in
+      `docker-compose.yml`'s `environment:` (not `backends.py` defaults —
+      that's where the setting already lived), via a new
+      `ollama-server_default` external network declared alongside
+      `accountant`, replacing an earlier manual `docker network connect`.
+      Rebuilt and recreated the container; confirmed clean startup and
+      Mattermost reconnection.
+- [x] Re-ran `mattermost/bridge/tests/` — **313 tests pass** (up from the 161
+      recorded when the eval plan was first written), run from the repo root
+      using the shared Spark `.venv` (bridge's own container can't run its
+      tests — `conftest.py` needs host-level Docker access and a full repo
+      checkout, documented in `lori-model-evaluation-plan.md`'s new "Test
+      environment note"). No Qwen-specific assertion needed fixing.
+- [x] **All three consumers now cut over.** `daily-run.md` and
+      `lori-system-overview.md` still reference the old server/model —
+      lower-priority doc cleanup, not a functional blocker.
 - [ ] Retire `ollama-poc` service + volume from `mattermost/docker-compose.yml`,
       and `clp-ollama` from `ColoradoLandPartners/compose.yaml`, once all
       three consumers have run on `ollama-server` through a burn-in period
@@ -54,5 +64,6 @@ out of scope.
 ## Next steps
 
 ### Qwen → Gemma 4 migration
-1. Cut over `mattermost/bridge`'s env vars — the last remaining consumer.
-2. Re-run `mattermost/bridge/tests/` and fix any Qwen-specific assertions.
+1. Let the burn-in period run — watch all three consumers in production.
+2. Update the remaining stale docs (`daily-run.md`, `lori-system-overview.md`).
+3. Retire `ollama-poc`/`clp-ollama` once burn-in is confirmed clean.
