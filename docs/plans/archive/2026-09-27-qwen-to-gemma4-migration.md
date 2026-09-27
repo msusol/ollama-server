@@ -85,9 +85,10 @@ accuracy needs its own spot-check, not just a code-level test pass.
       GPU detected (`NVIDIA GB10`, 121.7 GiB unified VRAM); first request
       took ~66s (cold model load), subsequent requests should be much
       faster while the model stays resident
-- [ ] If `clp_parcel_ai`'s evaluation (below) shows `gemma4:12b` is still
-      needed for that pipeline's accuracy/latency tradeoff, pull it too:
-      `docker exec ollama-server ollama pull gemma4:12b`
+- [x] ~~If `clp_parcel_ai`'s evaluation shows `gemma4:12b` is still needed,
+      pull it too~~ — not needed. The evaluation found no regression on
+      `gemma4:26b` (13/13 scenarios, 203/203 tests); `clp-ollama`/`gemma4:12b`
+      was retired outright 2026-09-27 rather than kept alongside.
 
 ### Validate before cutover (behavioral, not just unit tests)
 
@@ -157,27 +158,33 @@ accuracy needs its own spot-check, not just a code-level test pass.
       container can't run its tests — `conftest.py` needs host-level Docker
       access and a full repo checkout; see that plan's new "Test environment
       note"). No Qwen-specific assertion needed fixing.
-- [x] Update `accountant_agent/docs/process/categorization.md` and
-      `document-wiki.md` — done 2026-09-27
-- [ ] Update `daily-run.md`, `accountant_agent/docs/specs/lori-system-overview.md`,
-      and `clp_parcel_ai`'s own docs referencing `clp-ollama` — replace with
-      `ollama-server`
+- [x] Update `accountant_agent/docs/process/categorization.md`,
+      `document-wiki.md`, `daily-run.md`, and
+      `accountant_agent/docs/specs/lori-system-overview.md` — done 2026-09-27
+- [x] Updated `clp_parcel_ai/etl/ollama_eval/scenarios.py`'s docstring
+      referencing `clp-ollama` — done 2026-09-27
 
 ### Retire ollama-poc and clp-ollama
 
-- [ ] Confirm `ollama-server` has run cutover in production for a burn-in
-      period with no regressions reported, for **all three** consumer groups
-      (now all cut over: `clp_parcel_ai`, `accountant_agent`,
-      `mattermost/bridge`)
-- [ ] Remove the `ollama-poc` service from `mattermost/docker-compose.yml`
-      and its `ollama_poc_data` volume
-- [ ] Remove the `ollama`/`clp-ollama` service from
-      `ColoradoLandPartners/compose.yaml` and its volume
-      (`coloradolandpartners_ollama_data`)
-- [ ] Mark `mattermost/docs/adr/0001-run-poc-ollama-on-nvidia-docker-engine.md`
-      status as `Superseded by ollama-server/docs/adr/0002` (cross-repo
-      cross-reference — note this explicitly in that ADR's status line
-      since it lives in a different repo)
+Both retired 2026-09-27 — Mark confirmed no burn-in period was needed for any
+of the three consumers.
+
+- [x] Removed the `ollama-poc` service from `mattermost/docker-compose.yml`,
+      stopped/removed the `ollama-poc` container, and removed its
+      `ollama_poc_data` volume. Also fixed `backends.py`'s own hardcoded
+      fallback default (was still `ollama-poc`/`qwen3:14b`, unused in
+      practice since `docker-compose.yml` already overrode it, but would have
+      been a landmine for any non-compose run once the host was gone).
+      Rebuilt/recreated `bridge`; re-ran its 313-test suite — all pass.
+- [x] Removed the `ollama` (`clp-ollama`) service from
+      `ColoradoLandPartners/compose.yaml`, stopped/removed the `clp-ollama`
+      container, and removed its volume (`coloradolandpartners_ollama_data`).
+      Confirmed `clp-app` doesn't depend on it (already removed from
+      `depends_on` during cutover); no rebuild needed, just the compose file
+      edit. Re-ran the full `clp_parcel_ai/etl/tests/` suite (203 tests) and a
+      live `parse_ownership()` smoke test against `ollama-server` — all pass.
+- [x] Marked `mattermost/docs/adr/0001-run-poc-ollama-on-nvidia-docker-engine.md`
+      status as `Superseded by ollama-server/docs/adr/0002` — done 2026-09-27
 
 ## Notes
 
