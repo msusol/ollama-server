@@ -126,9 +126,13 @@ accuracy needs its own spot-check, not just a code-level test pass.
 
 - [ ] Update `mattermost/bridge/backends.py` defaults (or its `.env`) —
       `OLLAMA_URL` → `ollama-server`'s address, `OLLAMA_MODEL=gemma4:26b`
-- [ ] Update `accountant_agent/categorize/llm.py` and
-      `accountant_agent/wiki/extract.py` defaults (or shared `.env`) the
-      same way
+- [x] Update `accountant_agent/categorize/llm.py` and
+      `accountant_agent/wiki/extract.py` defaults — done 2026-09-27. Found
+      there was no override anywhere (no systemd `Environment=`, no `.env`
+      loading in either module — they used a bare `os.environ.get()`), so
+      also routed both through `config.get_setting()`, matching every other
+      setting in this codebase; `accountant_agent/.env` is now the real
+      override lever for a future swap
 - [x] Update `clp_parcel_ai/compose.yaml`'s `app` service — `OLLAMA_HOST` →
       `ollama-server`'s address, via a new `ollama-server_default` external
       network (the `ollama`/`clp-ollama` service is kept, undeleted, for
@@ -140,10 +144,12 @@ accuracy needs its own spot-check, not just a code-level test pass.
       recreated `clp-app` container with the real cutover config (no
       override flags). Also added `test_ownership_parser_llm.py`, mocked
       unit test coverage for `parse_ownership()` that didn't exist before
-      (`accountant_agent`/`mattermost` re-run still pending — see above)
-- [ ] Update `accountant_agent/docs/process/categorization.md`,
-      `document-wiki.md`, `daily-run.md`,
-      `accountant_agent/docs/specs/lori-system-overview.md`,
+- [x] Re-ran `accountant_agent/tests/` (547 tests) after cutover — all pass,
+      confirmed with zero override flags against the new default. `mattermost`
+      re-run still pending — see above.
+- [x] Update `accountant_agent/docs/process/categorization.md` and
+      `document-wiki.md` — done 2026-09-27
+- [ ] Update `daily-run.md`, `accountant_agent/docs/specs/lori-system-overview.md`,
       `mattermost/docs/process/mattermost-stack.md`, and `clp_parcel_ai`'s
       own docs referencing `clp-ollama` — replace with `ollama-server`
 

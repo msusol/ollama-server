@@ -30,14 +30,23 @@ out of scope.
       repointed to `ollama-server`/`gemma4:26b`; `clp-ollama` kept running
       for rollback. Full writeup:
       `ColoradoLandPartners/docs/plans/2026-09-27-ollama-server-cutover-eval.md`
-- [ ] Validate `accountant_agent` categorization + wiki-extraction quality
-      against Gemma vs. the Qwen baseline
-- [ ] Cut over `mattermost/bridge/backends.py` and
-      `accountant_agent/categorize/llm.py` + `wiki/extract.py` env vars
-- [ ] Re-run `mattermost/bridge/tests/` and `accountant_agent/tests/` —
-      fix any Qwen-specific assertions
-- [ ] Update `accountant_agent` and `mattermost` process/spec docs to
-      reference `ollama-server` instead of `ollama-poc`
+- [x] **`accountant_agent` fully cut over** — 2026-09-27. 11/11 eval
+      scenarios pass on `gemma4:26b` (10/11 on the `qwen3:14b` baseline —
+      the one baseline failure, falling for a document prompt-injection
+      that `gemma4:26b` resists, favors the cutover); full 547-test suite
+      passes. `categorize/llm.py`/`wiki/extract.py` repointed via
+      `config.get_setting()` (env var → `accountant_agent/.env` → default),
+      not a bare `os.environ.get()` — found there was no override mechanism
+      at all beforehand. `ollama-poc` untouched (it's `mattermost`'s own
+      compose service, not `accountant_agent`'s). Full writeup:
+      `ColoradoLandPartners/accountant_agent/docs/plans/2026-09-27-ollama-server-cutover-eval.md`
+- [ ] Cut over `mattermost/bridge/backends.py` env vars (the last remaining
+      consumer)
+- [ ] Re-run `mattermost/bridge/tests/` — fix any Qwen-specific assertions
+- [ ] Update `mattermost`'s and `accountant_agent`'s remaining process/spec
+      docs (`daily-run.md`, `lori-system-overview.md`,
+      `mattermost-stack.md`) to reference `ollama-server` instead of
+      `ollama-poc`
 - [ ] Retire `ollama-poc` service + volume from `mattermost/docker-compose.yml`,
       and `clp-ollama` from `ColoradoLandPartners/compose.yaml`, once all
       three consumers have run on `ollama-server` through a burn-in period
@@ -45,5 +54,5 @@ out of scope.
 ## Next steps
 
 ### Qwen → Gemma 4 migration
-1. Validate `accountant_agent`'s categorization/wiki-extraction quality against Gemma.
-2. Cut over `mattermost/bridge` + `accountant_agent` env vars once validated.
+1. Cut over `mattermost/bridge`'s env vars — the last remaining consumer.
+2. Re-run `mattermost/bridge/tests/` and fix any Qwen-specific assertions.
