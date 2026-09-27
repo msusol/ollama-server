@@ -1,0 +1,26 @@
+services:
+  gemma-server:
+    image: ollama/ollama:latest
+    container_name: gemma-server
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      - OLLAMA_MAX_LOADED_MODELS=1
+    ports:
+      # Distinct from ollama-poc (11435) and clp-ollama (internal-only 11434) so
+      # both can run side by side during Phase 1 validation. Retire ollama-poc's
+      # port mapping once consumers have cut over — see docs/plans/.
+      - "127.0.0.1:11436:11434"
+    volumes:
+      - gemma_server_data:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  gemma_server_data:
+    external: true
