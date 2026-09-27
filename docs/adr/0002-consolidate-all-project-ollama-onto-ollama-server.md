@@ -43,7 +43,7 @@ it after any one model just guarantees another rename next time).
 `ollama-server` (this repo, container `ollama-server`) is the **single,
 NVIDIA-Docker-backed Ollama container serving every project**:
 `clp_parcel_ai`, `accountant_agent`, `mattermost/bridge`, and future
-`investment_agent`/`reece_agent`. It can hold and serve whichever model a
+`investment_agent`/`analyst_agent`. It can hold and serve whichever model a
 caller requests (`gemma4:26b` for chat/tool-calling consumers;
 `gemma4:12b` stays available if `clp_parcel_ai`'s pipeline still needs
 that specific size after evaluation).
