@@ -101,10 +101,15 @@ accuracy needs its own spot-check, not just a code-level test pass.
       vs. the Qwen baseline
 - [ ] Run `accountant_agent`'s wiki-extraction against a sample of real
       documents vs. the Qwen baseline
-- [ ] Spot-check `clp_parcel_ai`'s owner-name parsing and lead-response
-      classification accuracy on `gemma4:26b` vs. its current `gemma4:12b`
-      baseline — this is a model-size change, treat it as seriously as the
-      Qwen→Gemma comparison, not as a formality
+- [x] `clp_parcel_ai`'s owner-name parsing and lead-response classification —
+      **done 2026-09-27**, via a reusable eval harness
+      (`clp_parcel_ai/etl/ollama_eval/`), not just a spot-check. 13/13 scenarios
+      pass on both `gemma4:12b` and `gemma4:26b` after fixing two eval-harness
+      bugs (a name-fragment check compared against a dict's `str()` repr; a
+      summarizer scenario's synthetic input didn't match the real caller's
+      format) and one genuine prompt gap (`intent_unclear` misclassifying an
+      emoji-only reply). Full writeup:
+      `ColoradoLandPartners/docs/plans/2026-09-27-ollama-server-cutover-eval.md`
 
 ### Cut over
 
@@ -113,15 +118,18 @@ accuracy needs its own spot-check, not just a code-level test pass.
 - [ ] Update `accountant_agent/categorize/llm.py` and
       `accountant_agent/wiki/extract.py` defaults (or shared `.env`) the
       same way
-- [ ] Update `clp_parcel_ai/compose.yaml`'s `app` service —
-      `OLLAMA_HOST` → `ollama-server`'s address (drop the `ollama`/
-      `clp-ollama` service from that compose file once verified)
-- [ ] Update `clp_parcel_ai/config.yaml` → `ollama.model` to whichever tag
-      the evaluation above settles on
-- [ ] Re-run `mattermost/bridge/tests/`, `accountant_agent/tests/`, and
-      `clp_parcel_ai`'s `etl/tests/test_lead_response_analysis.py` — confirm
-      all pass; update any assertion that encoded old model-specific
-      response text/formatting
+- [x] Update `clp_parcel_ai/compose.yaml`'s `app` service — `OLLAMA_HOST` →
+      `ollama-server`'s address, via a new `ollama-server_default` external
+      network (the `ollama`/`clp-ollama` service is kept, undeleted, for
+      rollback — see "Retire" below) — done 2026-09-27
+- [x] Update `clp_parcel_ai/config.yaml` → `ollama.model: gemma4:26b` — done
+      2026-09-27
+- [x] Re-ran the full `clp_parcel_ai/etl/tests/` suite (203 tests, not just
+      `test_lead_response_analysis.py`) — all pass, confirmed inside the
+      recreated `clp-app` container with the real cutover config (no
+      override flags). Also added `test_ownership_parser_llm.py`, mocked
+      unit test coverage for `parse_ownership()` that didn't exist before
+      (`accountant_agent`/`mattermost` re-run still pending — see above)
 - [ ] Update `accountant_agent/docs/process/categorization.md`,
       `document-wiki.md`, `daily-run.md`,
       `accountant_agent/docs/specs/lori-system-overview.md`,
