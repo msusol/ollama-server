@@ -56,24 +56,35 @@ accuracy needs its own spot-check, not just a code-level test pass.
 
 ### Stand up ollama-server (reuse existing model data, don't re-pull)
 
-- [ ] Create the external `ollama_server_data` volume
-      (`docker volume create ollama_server_data`)
-- [ ] Copy the `gemma4:26b` blobs from `ollama_poc_data` into
-      `ollama_server_data` via a throwaway container, e.g.:
+- [x] Create the external `ollama_server_data` volume — done 2026-09-27.
+      Note: this host has two Docker CLI contexts (`default`, the real
+      engine everything runs under, and `desktop-linux`, an unused/empty
+      Docker Desktop engine); commands must target `--context default`
+      explicitly or `DOCKER_CONTEXT=default`, since plain `docker` picked
+      `desktop-linux` inconsistently across shell invocations
+- [x] Copy the `gemma4:26b` blobs from `ollama_poc_data` into
+      `ollama_server_data` via a throwaway container — done 2026-09-27
+      (26GB copied, includes `qwen3:14b` too since `ollama` dedupes by
+      digest; harmless, can be pruned later since only `gemma4:26b` is
+      needed going forward). Host is arm64 (DGX Spark/Grace) — use
+      `--platform linux/arm64` explicitly or the default `alpine:latest`
+      pull may resolve to `amd64` and fail with `exec format error`:
       ```zsh
-      docker run --rm \
+      docker --context default run --rm --platform linux/arm64 \
         -v ollama_poc_data:/from \
         -v ollama_server_data:/to \
         alpine \
         sh -c "cp -a /from/. /to/."
       ```
-      then prune anything qwen-specific from the copy if `ollama` doesn't
-      already de-dup correctly — verify with `ollama list` after bringing
-      the container up, don't assume.
-- [ ] Bring up `compose.yaml` in this repo (`docker compose up -d`) on
-      `spark-db62`
-- [ ] Smoke-test: `curl http://127.0.0.1:11436/api/tags` shows `gemma4:26b`
-      without a fresh download
+- [x] Bring up `compose.yaml` in this repo (`docker compose up -d`) on
+      `spark-db62` — done 2026-09-27, container `ollama-server` up on
+      `127.0.0.1:11436`
+- [x] Smoke-test: `curl http://127.0.0.1:11436/api/tags` shows `gemma4:26b`
+      without a fresh download — confirmed 2026-09-27
+- [x] Real inference smoke-test via `/api/chat` — confirmed 2026-09-27;
+      GPU detected (`NVIDIA GB10`, 121.7 GiB unified VRAM); first request
+      took ~66s (cold model load), subsequent requests should be much
+      faster while the model stays resident
 - [ ] If `clp_parcel_ai`'s evaluation (below) shows `gemma4:12b` is still
       needed for that pipeline's accuracy/latency tradeoff, pull it too:
       `docker exec ollama-server ollama pull gemma4:12b`

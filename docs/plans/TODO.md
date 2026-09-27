@@ -12,7 +12,11 @@ for full context. Scope: `mattermost/bridge` + `accountant_agent` only —
 scope.
 
 - [x] Repo scaffolded (`compose.yaml`, `docs/{adr,plans,process,specs}`)
-- [ ] Stand up `ollama-server` container, pull `gemma4:26b`
+- [x] Renamed repo/container to `ollama-server`; ADR 0002 broadens scope
+      to also consolidate `clp-ollama`
+- [x] `ollama-server` standing up on `spark-db62` — `gemma4:26b` reused
+      from `ollama-poc`'s existing data (no re-download), real inference
+      confirmed via `/api/chat` — 2026-09-27
 - [ ] Re-run `lori-model-evaluation-plan.md`-style behavioral eval against
       `ollama-server`
 - [ ] Validate `accountant_agent` categorization + wiki-extraction quality
