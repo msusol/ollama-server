@@ -4,11 +4,12 @@ Shared Ollama model-serving container for the `LosusAIOps` cluster
 (`mattermost/bridge`, `accountant_agent`, and `clp_parcel_ai`), currently
 serving Gemma 4 (`gemma4:26b`). Named for the runtime (Ollama), not the
 model, since a future model swap shouldn't require another repo rename.
-Replaces `ollama-poc` (`qwen3:14b`) and `clp-ollama` (`gemma4:12b`).
+Replaced `ollama-poc` (`qwen3:14b`) and `clp-ollama` (`gemma4:12b`), both
+retired 2026-09-27.
 
 See `docs/index.md` for the full doc set — start with
 `docs/adr/0002-consolidate-all-project-ollama-onto-ollama-server.md` and
-`docs/plans/2026-09-27-qwen-to-gemma4-migration.md`.
+`docs/plans/archive/2026-09-27-qwen-to-gemma4-migration.md`.
 
 ## Quick reference
 

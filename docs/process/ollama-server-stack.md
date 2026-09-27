@@ -66,21 +66,20 @@ requests are much faster while the model stays resident.
 - **`exec format error` running a throwaway container (e.g. `alpine`) for
   a volume copy**: the image resolved to the wrong CPU architecture. Pass
   `--platform linux/arm64` on this host.
-- **Port 11436 already in use**: check nothing else bound it —
-  `ollama-poc` uses 11435, `clp-ollama` has no host port mapping (internal
-  only), and a host systemd `ollama.service` (not a container) may already
-  hold 11434.
+- **Port 11436 already in use**: check nothing else bound it — a stray prior
+  container, or a host-level Ollama install (not a container) may already
+  hold a nearby port.
 - **GPU OOM**: `OLLAMA_MAX_LOADED_MODELS=1` is already set in
   `compose.yaml`; if OOM still occurs, check no other GPU-resident
-  container (`ollama-poc`, `clp-ollama`) is loaded at the same time — see
-  `mattermost/docs/adr/0001-run-poc-ollama-on-nvidia-docker-engine.md` for
-  why running multiple simultaneously was previously rejected. This host's
-  GPU (`NVIDIA GB10`) has 121.7 GiB unified VRAM, so this is less pressing
-  here than on a discrete-GPU host, but still the reason for consolidating
-  onto one server per ADR 0002.
+  container is loaded at the same time — running several separate
+  Ollama containers on one GPU is exactly the fragmentation this repo
+  exists to avoid (see the ADRs). A GPU with large unified memory (e.g.
+  DGX Spark's `NVIDIA GB10`, 121.7 GiB) makes this less pressing than on a
+  discrete-GPU host, but it's still the reason for consolidating onto one
+  server per ADR 0002.
 
 ## Related docs
 
 - [ADR 0001 — Standalone shared Gemma server](../adr/0001-standalone-shared-gemma-server.md) *(superseded)*
 - [ADR 0002 — Consolidate all project Ollama onto ollama-server](../adr/0002-consolidate-all-project-ollama-onto-ollama-server.md)
-- [Ollama consolidation & Qwen → Gemma 4 migration plan](../plans/2026-09-27-qwen-to-gemma4-migration.md)
+- [Ollama consolidation & Qwen → Gemma 4 migration plan](../plans/archive/2026-09-27-qwen-to-gemma4-migration.md) *(archived — migration complete)*

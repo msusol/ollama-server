@@ -13,9 +13,9 @@ services:
     environment:
       - OLLAMA_MAX_LOADED_MODELS=1
     ports:
-      # Distinct from ollama-poc (11435) and clp-ollama (internal-only 11434) so
-      # both can run side by side during validation. Retire both once
-      # consumers have cut over — see docs/plans/.
+      # Bound to loopback only — reachable from host-side clients on this
+      # box and from other containers over the Docker network by service
+      # name (ollama-server:11434), never exposed externally.
       - "127.0.0.1:11436:11434"
     volumes:
       - ollama_server_data:/root/.ollama
